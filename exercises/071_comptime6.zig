@@ -40,8 +40,10 @@ pub fn main() void {
 
     const fields = @typeInfo(Narcissus).Struct.fields;
 
-    ??? {
-        if (field.field_type != void) {
+    inline for (fields) |field| {
+        // field_type is renamed to type in v0.11.0
+        // https://ziglang.org/documentation/master/std/#root;builtin.Type.StructField
+        if (field.type != void) {
             print(" {s}", .{field.name});
         }
     }
