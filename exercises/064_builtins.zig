@@ -28,24 +28,18 @@ const print = @import("std").debug.print;
 pub fn main() void {
     // The first builtin, alphabetically, is:
     //
-    //   @addWithOverflow(comptime T: type, a: T, b: T, result: *T) bool
-    //     * 'T' will be the type of the other parameters.
-    //     * 'a' and 'b' are numbers of the type T.
-    //     * 'result' is a pointer to space you're providing of type T.
-    //     * The return value is true if the addition resulted in a
-    //       value over or under the capacity of type T.
+    // Note: this is changed in zig 0.11.0
+    //   @addWithOverflow(a: anytype, b: anytype) struct { @TypeOf(a, b), u1 }
     //
     // Let's try it with a tiny 4-bit integer size to make it clear:
     const a: u4 = 0b1101;
     const b: u4 = 0b0101;
-    var my_result: u4 = undefined;
-    var overflowed: bool = undefined;
-    overflowed = @addWithOverflow(u4, a, b, &my_result);
+    var my_result = @addWithOverflow(a, b);
 
     // Check out our fancy formatting! b:0>4 means, "print
     // as a binary number, zero-pad right-aligned four digits."
     // The print() below will produce: "1101 + 0101 = 0010 (true)".
-    print("{b:0>4} + {b:0>4} = {b:0>4} ({})", .{ a, b, my_result, overflowed });
+    print("{b:0>4} + {b:0>4} = {b:0>4} ({})", .{ a, b, my_result[0], if (my_result[1] == 1) true else false });
 
     // Let's make sense of this answer. The value of 'b' in decimal is 5.
     // Let's add 5 to 'a' but go one by one and see where it overflows:
@@ -69,7 +63,7 @@ pub fn main() void {
     //
     // If there was no overflow at all while adding 5 to a, what value would
     // 'my_result' hold? Write the answer in into 'expected_result'.
-    const expected_result: u8 = ???;
+    const expected_result: u8 = 0b00010010;
     print(". Without overflow: {b:0>8}. ", .{expected_result});
 
     print("Furthermore, ", .{});
@@ -84,6 +78,6 @@ pub fn main() void {
     // Now it's your turn. See if you can fix this attempt to use
     // this builtin to reverse the bits of a u8 integer.
     const input: u8 = 0b11110000;
-    const tupni: u8 = @bitReverse(input, tupni);
+    const tupni: u8 = @bitReverse(input);
     print("{b:0>8} backwards is {b:0>8}.\n", .{ input, tupni });
 }
